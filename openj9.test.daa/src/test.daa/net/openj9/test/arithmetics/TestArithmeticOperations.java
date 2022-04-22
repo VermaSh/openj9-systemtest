@@ -15037,6 +15037,6 @@ public class TestArithmeticOperations
         long duration = endTime - startTime;
         System.out.printf("Arithmetics: Time taken for tests:%d \n", duration);
         System.out.println("Total: " + res.getRunCount() + " Fail: "+ res.getFailureCount() + " Ignore: " + res.getIgnoreCount());
-        JUnitCore.main("net.openj9.test.arithmetics.TestArithmeticOperations");
+        core.main("com.ibm.test.Arithmetics.TestArithmeticOperations");
     }
 }

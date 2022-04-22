@@ -468,6 +468,7 @@ public class TestValidityChecking extends TestArithmeticComparisonBase
     public void testInvalidSignDigits()
     {
         byte[] pd = new byte[10];
+        byte[] resultArray = new byte[10];
 
         Arrays.fill(pd, (byte) 0);
         pd[0] = 0x21;

@@ -889,6 +889,6 @@ public class TestArithmeticInline
 		JUnitCore core = new JUnitCore();
 		Result result = core.run(TestArithmeticInline.class);
 		System.out.println (result.getRunCount());
-		JUnitCore.main("net.openj9.test.arithmetics.TestArithmeticInline");
+		core.main("com.ibm.test.TestArithmeticInline");
 	}
 }
