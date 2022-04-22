@@ -852,8 +852,8 @@ public class TestByteArray2LongNumBytes
     /*
      * Take longs fitting within 3, 4 and 6 bytes and create byte arrays. For
      * each, perform the following tests: 1. Unmarshall completely (8 numBytes)
-     * - signed & unsigned 2. Unmarshall with the same number of numBytes -
-     * signed & unsigned 3. Unmarshall with a lesser number of numBytes - signed
+     * - signed & unsigned 2. Unmarshal with the same number of numBytes -
+     * signed & unsigned 3. Unmarshal with a lesser number of numBytes - signed
      * & unsigned 4. Negate and unmarshall with a lesser number of numBytes -
      * signed & unsigned
      */

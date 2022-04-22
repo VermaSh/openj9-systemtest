@@ -322,6 +322,8 @@ public class Utils {
 	
 	public static long modifyLength(long value, int newLength, boolean extend)
 	{
+		long target;
+		
 		String shortStr = toLength(Long.toHexString(value), 8);
 		int charLength = newLength * 2;
 		if (charLength < shortStr.length())
@@ -353,6 +355,7 @@ public class Utils {
 		 * if negative and extend, 
 		 * padd with ff's
 		 */
+		long target;
 		
 		String shortStr = toLength(Long.toHexString(value), newLength);
 		
@@ -373,7 +376,7 @@ public class Utils {
 	
 		long a = Long.parseLong(shortStr, 16);
 		
-		return a;
+		return Long.parseLong(shortStr, 16);
 	}
 	
 	public static short cutToShort(long x)
@@ -423,6 +426,7 @@ public class Utils {
 		 * if extend and new length larger
 		 * adjust to new length with FF's
 		 */
+		long target;
 		
 		String shortStr = toLength(Long.toHexString(value), 2);
 		int charLength = newLength * 2;
@@ -483,7 +487,9 @@ public class Utils {
 		}
 	}
 	
-	
+	//TODO: this should not be straight cutting
+	// should change this function to toDecimalDigits
+	// so that it can compare packed decimals correctly
 	public static BigInteger toPrecision(BigInteger x, int precision)
 	{
 		String xStr = x.toString();

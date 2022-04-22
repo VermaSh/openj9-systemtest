@@ -2519,14 +2519,6 @@ public class TestShiftsAndConvert
     @Test
     public void testLeftOffsetOne()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -3457,14 +3449,6 @@ public class TestShiftsAndConvert
     @Test
     public void testShiftLeftUnitCases()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -3570,14 +3554,6 @@ public class TestShiftsAndConvert
     @Test
     public void testShiftRightUnitCases()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4505,14 +4481,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts1()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4540,14 +4508,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts2()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4572,14 +4532,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts3()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4609,14 +4561,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts4()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];

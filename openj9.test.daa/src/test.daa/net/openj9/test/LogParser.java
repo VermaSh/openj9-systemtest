@@ -151,7 +151,6 @@ public class LogParser {
 			temp = br.readLine();
 		}
 		
-		br.close();
 		pw.close();
 	}
 	
@@ -188,15 +187,11 @@ public class LogParser {
 			if (lTemp == null && rTemp == null)
 			{
 				// both files ended together
-				br.close();
-				br2.close();
 				return true;
 			}
 			else if (lTemp == null || rTemp == null)
 			{
 				System.out.println ("One of the files ended on line " + lineCount);
-				br.close();
-				br2.close();
 				return false;
 			}
 			else if (!(lTemp.equals(rTemp)))
@@ -204,8 +199,6 @@ public class LogParser {
 				System.out.println ("Difference on line " + lineCount + ": ");
 				System.out.println (lTemp);
 				System.out.println (rTemp);
-				br.close();
-				br2.close();
 				return false;
 			}
 			
@@ -215,8 +208,6 @@ public class LogParser {
 			lineCount++;
 		}
 		
-		br.close();
-		br2.close();
 		return true;
 	}
 	
@@ -229,13 +220,13 @@ public class LogParser {
 	public void addCallerName(String callerName)
 	{
 		//if (isActivated())
-		pw.println("@" + callerName);
+			pw.println("@" + callerName);
 	}
 	
 	public void addNotExpected(String funcName)
 	{
 		//if (isActivated())
-		pw.println("!" + funcName);
+			pw.println("!" + funcName);
 	}
 	
 	private static boolean isGenerated(String line)

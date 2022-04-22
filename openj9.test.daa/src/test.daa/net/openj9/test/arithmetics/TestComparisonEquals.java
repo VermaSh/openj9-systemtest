@@ -26,53 +26,53 @@ import org.junit.Test;
 public class TestComparisonEquals extends TestArithmeticComparisonBase
 {
 
-	@Test
-	public void testZeros()
-	{
-		// similiar to TestAddPD's testZeros
+    @Test
+    public void testZeros()
+    {
+        // similiar to TestAddPD's testZeros
 
-	}
+    }
 
-	@Test
-	public void testDifferentOffsets()
-	{
-		for (int i = 0; i < 4; ++i)
-		{
-			testOffset(i);
-		}
-	}
+    @Test
+    public void testDifferentOffsets()
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            testOffset(i);
+        }
+    }
 
-	public void testOffset(int offset)
-	{
-		// construct test cases for precision 1
+    public void testOffset(int offset)
+    {
+        // construct test cases for precision 1
 
-		// precision 2
+        // precision 2
 
-		// precision 3
+        // precision 3
 
-		// precision 4
-	}
+        // precision 4
+    }
 
-	@Test
-	public void randomTest()
-	{
-		for (int i = 0; i < 50; ++i)
-		{
+    @Test
+    public void randomTest()
+    {
+        for (int i = 0; i < 50; ++i)
+        {
 
-		}
-	}
+        }
+    }
 
-	@Test
-	public void testDifferentPrecisions()
-	{
+    @Test
+    public void testDifferentPrecisions()
+    {
 
-	}
+    }
 
-	// please implement the following according to the corresponding
-	// test methods in TestAddPD.java
-	@Test
-	public void testLongPrecisions()
-	{
+    // please implement the following according to the corresponding
+    // test methods in TestAddPD.java
+    @Test
+    public void testLongPrecisions()
+    {
 
-	}
+    }
 }

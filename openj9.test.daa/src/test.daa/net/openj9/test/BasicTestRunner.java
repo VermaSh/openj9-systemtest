@@ -37,7 +37,7 @@ public class BasicTestRunner {
 	 * @param  c              the class to execute with JUnitCore.runClasses
 	 * @return wasSuccessful  whether all tests were successful
 	 */
-	public static boolean runClass(Class<?> c) {
+	public static boolean runClass(Class c) {
 		Result res = JUnitCore.runClasses(c);
 		System.out.println("\n" + c + " Total: " + res.getRunCount() + " Fail: "+ res.getFailureCount() + " Ignore: " + res.getIgnoreCount());
 
@@ -47,7 +47,7 @@ public class BasicTestRunner {
 			Iterator<Failure> it = failures.iterator();
 			
 			while (it.hasNext()) {
-				Failure fail = it.next();
+				Failure fail = (Failure)it.next();
 				System.err.println("\tFAILURE: " + fail.getDescription() + " - " + fail.getMessage());
 			}
 		}

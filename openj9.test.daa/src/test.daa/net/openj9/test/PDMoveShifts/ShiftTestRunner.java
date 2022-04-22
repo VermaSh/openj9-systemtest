@@ -25,9 +25,14 @@ import net.openj9.test.BasicTestRunner;
 
 public class ShiftTestRunner
 {
-    public static void invokeTest()
+    public static void main(String[] args)
     {
         int x = 10;
+
+        if (args.length > 0)
+        {
+            x = new Integer(args[0]).intValue();
+        }
 
         if (runTests(x))
             System.exit(1);

@@ -29,52 +29,71 @@ import org.junit.Test;
 
 import com.ibm.dataaccess.*;
 
-import net.openj9.test.Utils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
 import java.util.Random;
+
+import com.ibm.test.LogParser;
+import com.ibm.test.Utils;
+import com.ibm.test.Utils.TestValue;
+import com.ibm.test.Utils.TestValue.LargeNegative;
+import com.ibm.test.Utils.TestValue.LargePositive;
+import com.ibm.test.Utils.TestValue.LargestPossible;
+import com.ibm.test.Utils.TestValue.SmallNegative;
+import com.ibm.test.Utils.TestValue.SmallPositive;
+import com.ibm.test.Utils.TestValue.SmallestPossible;
+import com.ibm.test.Utils.TestValue.Zero;
+
 
 import static org.junit.Assert.*;
 
 public class TestDecimalData2 {
 	
 	static String outputFile;
+	static String cvsid = "$Id: TestGeneration.java,v 1.2 2012-12-06 16:12:49 vetterlein Exp $"; 
 	static Random randomGenerator;
 	
-	byte[] externalDecimal = new byte[64];
-	final int offset0 = 0;
-	final int offset5 = 5;
-	final int offset10 = 10;
-	final int offset25 = 25;
-	final int offset50 = 50;
-	final int precision1 = 1;
-	final int precision2 = 2;
-	final int precision15 = 15;
-	final int precision16 = 16;
-	final int precision30 = 30;
-	final int precision31 = 31;
-	final int precision50 = 50;
-	final int precision100 = 100;
-	final boolean errorChecking = false;
-	final boolean errorCheckingFalse = false;
 	
-	final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
-	final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
-	final int decimalType3 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
-	final int decimalType4 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
-	final int decimalType5 = DecimalData.UNICODE_UNSIGNED;
-	final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
-	final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
+    byte[] externalDecimal = new byte[64];
+    final int offset0 = 0;
+    final int offset5 = 5;
+    final int offset10 = 10;
+    final int offset25 = 25;
+    final int offset50 = 50;
+    final int precision1 = 1;
+    final int precision2 = 2;
+    final int precision15 = 15;
+    final int precision16 = 16;
+    final int precision30 = 30;
+    final int precision31 = 31;
+    final int precision50 = 50;
+    final int precision100 = 100;
+    final boolean errorChecking = false;
+    final boolean errorCheckingFalse = false;
+    
+    final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
+    final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
+    final int decimalType3 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
+    final int decimalType4 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
+    final int decimalType5 = DecimalData.UNICODE_UNSIGNED;
+    final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
+    final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
+    
+    long value = Utils.TestValue.SmallPositive.LongValue;
+    String dataName = "PackedDecimalToUnicodeDecimal";
+    String typeName = "UNICODE_UNSIGNED";
+    String testType = "Normal Value";
+    String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+    
+    byte[] packedDecimal = new byte[64];
+    char[] unicodeDecimal = new char[128];
+    byte[] finalDecimal = new byte[64];	
 	
-	long value = Utils.TestValue.SmallPositive.LongValue;
-	String dataName = "PackedDecimalToUnicodeDecimal";
-	String typeName = "UNICODE_UNSIGNED";
-	String testType = "Normal Value";
-	String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
 	
-	byte[] packedDecimal = new byte[64];
-	char[] unicodeDecimal = new char[128];
-	byte[] finalDecimal = new byte[64];	
+	
+	
+	
 
 	static {
 		outputFile = "expected."+TestDecimalData2.class.getSimpleName()+".txt";
@@ -109,22 +128,22 @@ public class TestDecimalData2 {
 	
 	@Test
 	public void testLong2ED2Long(){
-		
-		
-		long result;
+	    
+	    
+	    long result;
 	   
-		byte[] edValue = new byte[100];
-		for(int i = 0; i<1000;i++){
-			long value = randomGenerator.nextLong();
-			int length = String.valueOf(value).length();
-			for(int decimalType = 1; decimalType<=4;decimalType++){
-				DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,decimalType);
-				result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,decimalType);
-				assertEquals(value,result);
-			}
-			
-		}
-		
+	    byte[] edValue = new byte[100];
+	    for(int i = 0; i<1000;i++){
+	        long value = randomGenerator.nextLong();
+	        int length = String.valueOf(value).length();
+	        for(int decimalType = 1; decimalType<=4;decimalType++){
+	            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,decimalType);
+	            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,decimalType);
+	            assertEquals(value,result);
+	        }
+	        
+	    }
+	    
 	}
 	
 	@Test
@@ -183,111 +202,111 @@ public class TestDecimalData2 {
 	}
 
 	@Test
-	public void testInteger2ED2Integer(){
-		
-		
-		int result;
-	   
-		byte[] edValue = new byte[100];
-		for(int i = 0; i<1000;i++){
-			int value = randomGenerator.nextInt();
-			int length = String.valueOf(value).length();
-			for(int decimalType = 1; decimalType<=4;decimalType++){
-				DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,decimalType);
-				result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,decimalType);
-				assertEquals(value,result);
-			}
-			
-		}
-		
-	}
+    public void testInteger2ED2Integer(){
+        
+        
+        int result;
+       
+        byte[] edValue = new byte[100];
+        for(int i = 0; i<1000;i++){
+            int value = randomGenerator.nextInt();
+            int length = String.valueOf(value).length();
+            for(int decimalType = 1; decimalType<=4;decimalType++){
+                DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,decimalType);
+                result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,decimalType);
+                assertEquals(value,result);
+            }
+            
+        }
+        
+    }
 	
 	@Test
 	public void testBiggestLong2ED2Long(){
-		
-		long result;
-		   
-		byte[] edValue = new byte[100];
-		
-		long value = Long.MAX_VALUE;
-		int length = 19;
-		
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,2);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,2);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,3);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,3);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,4);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,4);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,1);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,1);
-			assertEquals(value,result);
-			
-			
-			//overflow
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,1);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,1);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,2);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,2);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,3);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,3);
-			assertEquals(value,result);
-			
-			DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,4);
-			result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,4);
-			assertEquals(value,result);
-		}
+	    
+	    long result;
+	       
+        byte[] edValue = new byte[100];
+        
+        long value = Long.MAX_VALUE;
+        int length = 19;
+        
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,2);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,2);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,3);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,3);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,4);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,4);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, false,1);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, false,1);
+            assertEquals(value,result);
+            
+            
+            //overflow
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,1);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,1);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,2);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,2);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,3);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,3);
+            assertEquals(value,result);
+            
+            DecimalData.convertLongToExternalDecimal(value, edValue, 0, length, true,4);
+            result = DecimalData.convertExternalDecimalToLong(edValue, 0, length, true,4);
+            assertEquals(value,result);
+        }
 	@Test
 	public void testBiggestInt2ED2Int(){
-		
-		int result;
-		   
-		byte[] edValue = new byte[100];
-		
-		int value = Integer.MAX_VALUE;
-		int length = 10;
+	    
+	    int result;
+	       
+        byte[] edValue = new byte[100];
+        
+        int value = Integer.MAX_VALUE;
+        int length = 10;
 
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,1);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,1);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,2);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,2);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,3);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,3);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,4);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,4);
-		assertEquals(value,result);
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,1);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,1);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,2);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,2);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,3);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,3);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,4);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,4);
+        assertEquals(value,result);
  
-		//overflow
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,1);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,1);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,2);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,2);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,3);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,3);
-		assertEquals(value,result);
-		
-		DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,4);
-		result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,4);
-		assertEquals(value,result);
+        //overflow
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,1);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,1);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,2);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,2);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,3);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,3);
+        assertEquals(value,result);
+        
+        DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,4);
+        result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,4);
+        assertEquals(value,result);
 	}
 	
 	@Test
@@ -384,207 +403,207 @@ public class TestDecimalData2 {
 	}
 	
 	   @Test
-		public void testBiggestInteger2ED2Integer(){
-			
-			int result;
-			   
-			byte[] edValue = new byte[100];
-			
-			int value = Integer.MAX_VALUE;
-			int length = 10;
+	    public void testBiggestInteger2ED2Integer(){
+	        
+	        int result;
+	           
+	        byte[] edValue = new byte[100];
+	        
+	        int value = Integer.MAX_VALUE;
+	        int length = 10;
 
-		 
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,1);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,1);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,2);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,2);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,3);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,3);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,4);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,4);
-			assertEquals(value,result);
-			  
-			// overflow
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,1);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,1);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,2);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,2);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,3);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,3);
-			assertEquals(value,result);
-				
-			DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,4);
-			result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,4);
-			assertEquals(value,result);				
-		}
+         
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,1);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,1);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,2);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,2);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,3);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,3);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, false,4);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, false,4);
+            assertEquals(value,result);
+              
+            // overflow
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,1);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,1);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,2);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,2);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,3);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,3);
+            assertEquals(value,result);
+                
+            DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, length, true,4);
+            result = DecimalData.convertExternalDecimalToInteger(edValue, 0, length, true,4);
+            assertEquals(value,result);	            
+	    }
 	   
-	   @Test
-	   public void testInteger2ED2IntegerDecreasingPrecision(){
-		   
-		  int result;
-		   byte[] edValue = new byte[100];
-		   
-		   int value = 12345;
+       @Test
+       public void testInteger2ED2IntegerDecreasingPrecision(){
+           
+          int result;
+           byte[] edValue = new byte[100];
+           
+           int value = 12345;
 
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,1);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,1);
-		   assertEquals(2345,result);
-		   
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,2);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,2);
-		   assertEquals(2345,result);
-		   
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,3);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,3);
-		   assertEquals(2345,result);
-		   
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,4);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,4);
-		   assertEquals(2345,result);
-		   
-		   //overflow
-		   try{
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,1);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,1);
-		   assertEquals(2345,result);
-		   } catch (Exception e)
-		   {}
-		   
-		   try {
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,2);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,2);
-		   assertEquals(2345,result);
-		   } catch (Exception e)
-		   {}
-		   
-		   try {
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,3);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,3);
-		   assertEquals(2345,result);
-		   } catch (Exception e)
-		   {}
-		   
-		   try {
-		   DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,4);
-		   result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,4);
-		   assertEquals(2345,result);
-		   } catch (Exception e)
-		   {}
-	   }
-	   
-	   @Test
-	   public void testLong2ED2LongDecreasingPrecision(){
-		   
-		  long result;
-		   byte[] edValue = new byte[100];
-		   
-		   long value = 12345;
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,1);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,1);
+           assertEquals(2345,result);
+           
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,2);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,2);
+           assertEquals(2345,result);
+           
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,3);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,3);
+           assertEquals(2345,result);
+           
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, false,4);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, false,4);
+           assertEquals(2345,result);
+           
+           //overflow
+           try{
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,1);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,1);
+           assertEquals(2345,result);
+           } catch (Exception e)
+           {}
+           
+           try {
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,2);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,2);
+           assertEquals(2345,result);
+           } catch (Exception e)
+           {}
+           
+           try {
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,3);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,3);
+           assertEquals(2345,result);
+           } catch (Exception e)
+           {}
+           
+           try {
+           DecimalData.convertIntegerToExternalDecimal(value, edValue, 0, 4, true,4);
+           result = DecimalData.convertExternalDecimalToInteger(edValue, 0, 4, true,4);
+           assertEquals(2345,result);
+           } catch (Exception e)
+           {}
+       }
+       
+       @Test
+       public void testLong2ED2LongDecreasingPrecision(){
+           
+          long result;
+           byte[] edValue = new byte[100];
+           
+           long value = 12345;
 
-			   DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,1);
-			   result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,1);
-			   assertEquals(2345,result);
-			   
-			   DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,2);
-			   result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,2);
-			   assertEquals(2345,result);
-			   
-			   DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,3);
-			   result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,3);
-			   assertEquals(2345,result);
-			   
-			   DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,4);
-			   result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,4);
-			   assertEquals(2345,result);
-	   }
+               DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,1);
+               result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,1);
+               assertEquals(2345,result);
+               
+               DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,2);
+               result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,2);
+               assertEquals(2345,result);
+               
+               DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,3);
+               result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,3);
+               assertEquals(2345,result);
+               
+               DecimalData.convertLongToExternalDecimal(value, edValue, 0, 4, false,4);
+               result = DecimalData.convertExternalDecimalToLong(edValue, 0, 4, false,4);
+               assertEquals(2345,result);
+       }
 	  
 	
 	   @Test
-		public void testBiggestLong2UD2Long(){
-			
-			long result;
-			   
-		   long value = Long.MAX_VALUE;
-			
-			char[] udValue = new char[100];
-			int length = String.valueOf(value).length();
-				for(int decimalType = 6; decimalType<=7;decimalType++){
-					DecimalData.convertLongToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
-					result = DecimalData.convertUnicodeDecimalToLong(udValue, 0, length, false,decimalType);
-					assertEquals(value,result);
-				}
-				
-			}
-		
+	    public void testBiggestLong2UD2Long(){
+	        
+	        long result;
+	           
+	       long value = Long.MAX_VALUE;
+	        
+	        char[] udValue = new char[100];
+	        int length = String.valueOf(value).length();
+	            for(int decimalType = 6; decimalType<=7;decimalType++){
+	                DecimalData.convertLongToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
+	                result = DecimalData.convertUnicodeDecimalToLong(udValue, 0, length, false,decimalType);
+	                assertEquals(value,result);
+	            }
+	            
+	        }
+	    
 	
 	
 	   @Test
-		public void testLong2UD2Long(){
-			
-			
-			long result;
-		   
-			char[] udValue = new char[100];
-			for(int i = 0; i<1000;i++){
-				long value = randomGenerator.nextLong();
-				int length = String.valueOf(value).length();
-				for(int decimalType = 6; decimalType<=7;decimalType++){
-					DecimalData.convertLongToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
-					result = DecimalData.convertUnicodeDecimalToLong(udValue, 0, length, false,decimalType);
-					assertEquals(value,result);
-				}
-				
-			}
-			
-		}
+	    public void testLong2UD2Long(){
+	        
+	        
+	        long result;
+	       
+	        char[] udValue = new char[100];
+	        for(int i = 0; i<1000;i++){
+	            long value = randomGenerator.nextLong();
+	            int length = String.valueOf(value).length();
+	            for(int decimalType = 6; decimalType<=7;decimalType++){
+	                DecimalData.convertLongToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
+	                result = DecimalData.convertUnicodeDecimalToLong(udValue, 0, length, false,decimalType);
+	                assertEquals(value,result);
+	            }
+	            
+	        }
+	        
+	    }
 	   
 
 	   
-	   @Test
-	   public void testInteger2UD2Integer(){
-		   
-		   
-		   int result;
-		  
-		   char[] udValue = new char[100];
-		   for(int i = 0; i<1000;i++){
-			   int value = randomGenerator.nextInt();
-			   int length = String.valueOf(value).length();
-			   for(int decimalType = 6; decimalType<=7;decimalType++){
-				   DecimalData.convertIntegerToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
-				   result = DecimalData.convertUnicodeDecimalToInteger(udValue, 0, length, false,decimalType);
-				   assertEquals(value,result);
-			   }
-			   
-		   }
-		   
-	   }
-	   
-	   @Test
-	   public void testBiggestInteger2UD2Integer(){
-		   
-		   int result;
-			  
-		  int value = Integer.MAX_VALUE;
-		   
-		   char[] udValue = new char[100];
-		   int length = String.valueOf(value).length();
-			   for(int decimalType = 6; decimalType<=7;decimalType++){
-				   DecimalData.convertIntegerToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
-				   result = DecimalData.convertUnicodeDecimalToInteger(udValue, 0, length, false,decimalType);
-				   assertEquals(value,result);
-			   }
-			   
-		   }
+       @Test
+       public void testInteger2UD2Integer(){
+           
+           
+           int result;
+          
+           char[] udValue = new char[100];
+           for(int i = 0; i<1000;i++){
+               int value = randomGenerator.nextInt();
+               int length = String.valueOf(value).length();
+               for(int decimalType = 6; decimalType<=7;decimalType++){
+                   DecimalData.convertIntegerToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
+                   result = DecimalData.convertUnicodeDecimalToInteger(udValue, 0, length, false,decimalType);
+                   assertEquals(value,result);
+               }
+               
+           }
+           
+       }
+       
+       @Test
+       public void testBiggestInteger2UD2Integer(){
+           
+           int result;
+              
+          int value = Integer.MAX_VALUE;
+           
+           char[] udValue = new char[100];
+           int length = String.valueOf(value).length();
+               for(int decimalType = 6; decimalType<=7;decimalType++){
+                   DecimalData.convertIntegerToUnicodeDecimal(value, udValue, 0, length, false,decimalType);
+                   result = DecimalData.convertUnicodeDecimalToInteger(udValue, 0, length, false,decimalType);
+                   assertEquals(value,result);
+               }
+               
+           }
 	
 	@Test
 	public void testi2PD()
@@ -640,10 +659,7 @@ public class TestDecimalData2 {
 		dataName = "IntegerToPackedDecimal";
 		typeName = "PackedDecimal";
 		testType = "Normal Value";
-
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "convertIntegerToPackedDecimal";
-
 		byte[] packedDecimal = new byte[64];
 		Arrays.fill(packedDecimal, (byte) 0x00);
 		
@@ -667,10 +683,7 @@ public class TestDecimalData2 {
 		dataName = "IntegerToPackedDecimal";
 		typeName = "PackedDecimal";
 		testType = "Normal Value";
-
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "convertIntegerToPackedDecimal";
-
 		byte[] packedDecimal = new byte[64];
 		Arrays.fill(packedDecimal, (byte) 0x00);
 		
@@ -688,8 +701,6 @@ public class TestDecimalData2 {
 	{
 		final int precision = 5;
 		final int offset0 = 0;
-
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		final String functionName = "converPackedDecimalToInteger"; 
 
 		int value = 12345;
@@ -828,576 +839,574 @@ public class TestDecimalData2 {
 	@Test
 	public void testOtherConverters_pd()
 	{
-		@SuppressWarnings("unused") // Useful to know what we're testing
-		String functionName = "convertPackedDecimal";
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        String functionName = "convertPackedDecimal";
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-
-		value = Utils.TestValue.LargePositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.LargePositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargestPossible.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargestPossible.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.SmallestPossible.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallestPossible.TestName + " " + testType +  " " + typeName;
-		
-		/*
-		 * Negative number, dont test
-		 * DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType9);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType9);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");*/
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.Zero.LongValue;
-		testName = dataName + " " + Utils.TestValue.Zero.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.LargestPossible.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargestPossible.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-		
-		testType = "Precision and Offset";
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision1, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision1, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision1, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.SmallNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
-		
-		/*
-		 * Don't test, negative
-		 * DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision2, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision2, decimalType9);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision2, decimalType9);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+        value = Utils.TestValue.SmallestPossible.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallestPossible.TestName + " " + testType +  " " + typeName;
+        
+        /*
+         * Negative number, dont test
+         * DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType9);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType9);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");*/
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-
-		Arrays.fill(unicodeDecimal, (char)0);
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset25, precision15, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset25, unicodeDecimal, offset25, precision15, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset25, finalDecimal, offset25, precision15, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        value = Utils.TestValue.Zero.LongValue;
+        testName = dataName + " " + Utils.TestValue.Zero.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(unicodeDecimal, (char)0);
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		/*
-		 * Negative, unsigned, dont test
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision16, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision16, decimalType9);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision16, decimalType9);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        
+        testType = "Precision and Offset";
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision1, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision1, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision1, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-
-		Arrays.fill(unicodeDecimal, (char)0);
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset50, precision2, errorChecking);
-		//lp.addNotExpected("convertLongToPackedDecimal");
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset50, unicodeDecimal, offset50, precision2, decimalType5);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset50, finalDecimal, offset50, precision2, decimalType5);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		/* Negative, unsigned, dont test
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision16, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision16, decimalType9);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision16, decimalType9);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+        value = Utils.TestValue.SmallNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
+        
+        /*
+         * Don't test, negative
+         * DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision2, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision2, decimalType9);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision2, decimalType9);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);*/
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
 
-		Arrays.fill(unicodeDecimal, (char)0);
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision30, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision30, decimalType5);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision30, decimalType5);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset25, precision15, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset25, unicodeDecimal, offset25, precision15, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset25, finalDecimal, offset25, precision15, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		/* negative, unsigned, don't test
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision50, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision50, decimalType9);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision50, decimalType9);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        /*
+         * Negative, unsigned, dont test
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision16, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision16, decimalType9);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision16, decimalType9);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+
+        Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset50, precision2, errorChecking);
+        //lp.addNotExpected("convertLongToPackedDecimal");
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset50, unicodeDecimal, offset50, precision2, decimalType5);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset50, finalDecimal, offset50, precision2, decimalType5);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        /* Negative, unsigned, dont test
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision16, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision16, decimalType9);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision16, decimalType9);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+
+        Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision30, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision30, decimalType5);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision30, decimalType5);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        /* negative, unsigned, don't test
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision50, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision50, decimalType9);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision50, decimalType9);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);*/
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 	}
 	
 	@Test
 	public void testOtherConvertes_UDSL()
 	{
-		/*
-		 * UNICODE_SIGN_EMBEDDED_LEADING
-		 */
-		
-		@SuppressWarnings("unused") // Useful to know what we're testing
-		String functionName = "PD2UD";
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		dataName = "PackedDecimalToUnicodeDecimal";
-		typeName = "UNICODE_SIGN_EMBEDDED_LEADING";
-		testType = "Normal Value";
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        /*
+         * UNICODE_SIGN_EMBEDDED_LEADING
+         */
+        
+        String functionName = "PD2UD";
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        dataName = "PackedDecimalToUnicodeDecimal";
+        typeName = "UNICODE_SIGN_EMBEDDED_LEADING";
+        testType = "Normal Value";
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-
-		value = Utils.TestValue.LargePositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.SmallNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.LargePositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargestPossible.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargestPossible.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.SmallNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-
-		value = Utils.TestValue.SmallestPossible.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallestPossible.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.Zero.LongValue;
-		testName = dataName + " " + Utils.TestValue.Zero.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-		
-		testType = "Precision and Offset";
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision1, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision1, decimalType6);
-		//lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision1, decimalType6);
-		//lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.SmallNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision2, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision2, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision2, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.LargestPossible.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargestPossible.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset25, precision15, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset25, unicodeDecimal, offset25, precision15, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset25, finalDecimal, offset25, precision15, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision16, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision16, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision16, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.SmallestPossible.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallestPossible.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset50, precision2, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset50, unicodeDecimal, offset50, precision2, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset50, finalDecimal, offset50, precision2, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
-
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision16, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision16, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision16, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.Zero.LongValue;
+        testName = dataName + " " + Utils.TestValue.Zero.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision31, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
-		
-		value = Utils.TestValue.SmallPositive.LongValue;
-		testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision30, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision30, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision30, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        
+        testType = "Precision and Offset";
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision1, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision1, decimalType6);
+        //lp.addNotExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision1, decimalType6);
+        //lp.addNotExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
 
 
-		value = Utils.TestValue.LargeNegative.LongValue;
-		testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
-		
-		DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision50, errorChecking);
-		//lp.addExpected("convertLongToPackedDecimal");
-		Arrays.fill(unicodeDecimal, (char)0);
-		DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision50, decimalType6);
-		//lp.addExpected("convertPackedDecimalToUnicodeDecimal");
-		DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision50, decimalType6);
-		//lp.addExpected("convertUnicodeDecimalToPackedDecimal");
-		testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
-		assertArrayEquals(testName, packedDecimal, finalDecimal);
+        value = Utils.TestValue.SmallNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision2, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision2, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision2, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
 
-		Arrays.fill(packedDecimal, (byte) 0x00);
-		Arrays.fill(finalDecimal, (byte) 0x00);
-		Arrays.fill(unicodeDecimal, (char)0);
-	
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset25, precision15, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset25, unicodeDecimal, offset25, precision15, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset25, finalDecimal, offset25, precision15, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset5, precision16, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset5, unicodeDecimal, offset5, precision16, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset5, finalDecimal, offset5, precision16, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset50, precision2, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset50, unicodeDecimal, offset50, precision2, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset50, finalDecimal, offset50, precision2, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision16, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision16, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision16, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+        
+        value = Utils.TestValue.SmallPositive.LongValue;
+        testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision30, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision30, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision30, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+
+
+        value = Utils.TestValue.LargeNegative.LongValue;
+        testName = dataName + " " + Utils.TestValue.LargeNegative.TestName + " " + testType +  " " + typeName;
+        
+        DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision50, errorChecking);
+        //lp.addExpected("convertLongToPackedDecimal");
+        Arrays.fill(unicodeDecimal, (char)0);
+        DecimalData.convertPackedDecimalToUnicodeDecimal(packedDecimal, offset0, unicodeDecimal, offset0, precision50, decimalType6);
+        //lp.addExpected("convertPackedDecimalToUnicodeDecimal");
+        DecimalData.convertUnicodeDecimalToPackedDecimal(unicodeDecimal, offset0, finalDecimal, offset0, precision50, decimalType6);
+        //lp.addExpected("convertUnicodeDecimalToPackedDecimal");
+        testName = "Line: " + " no  line " + ", " +  "no name"+ " line:"+  " no  line ";
+        assertArrayEquals(testName, packedDecimal, finalDecimal);
+
+        Arrays.fill(packedDecimal, (byte) 0x00);
+        Arrays.fill(finalDecimal, (byte) 0x00);
+        Arrays.fill(unicodeDecimal, (char)0);
+    
 	}
 	
 	@Test
@@ -1408,7 +1417,6 @@ public class TestDecimalData2 {
 		/*
 		 * UNICODE_SIGN_EMBEDDED_TRAILING
 		 */
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "UDST Tests";
 		
 		value = Utils.TestValue.SmallPositive.LongValue;
@@ -1697,6 +1705,7 @@ public class TestDecimalData2 {
 	public void testConvertBigIntegerExceptions()
 	{
 		//lp.addCallerName(Utils.getCallingMethod());
+		byte[] byte_array = new byte[64];
 		final int offset0 = 0;
 		final int precision31 = 31;
 		final boolean errorChecking = true;
@@ -1705,20 +1714,36 @@ public class TestDecimalData2 {
 		BigInteger value = Utils.TestValue.SmallPositive.BigIntegerValue;
 		
 		final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
+		final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
+		final int decimalType3 = DecimalData.EBCDIC_SIGN_SEPARATE_TRAILING;
+		final int decimalType4 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
+		final int decimalType5 = DecimalData.UNICODE_UNSIGNED;
 		final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
+		final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
 		
 		byte[] packedDecimal = new byte[64];
+		byte[] shiftedDecimal = new byte[64];
+		final int shift5 = 5 ;
+		final int shift25 = 25 ;
+		final int shift55 = 55 ;
+		final int shift85 = 85 ;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision100 = 100;
 		final int precision50 = 50;
 		final int precision5 = 5;
+		final boolean roundedFalse = false;
+		final boolean roundedTrue = true;
 		
+		final int scale0 = 0;
+		BigInteger result;
+				
 		String namePrecisionGreaterThanByteArray = " Precision greater than byte array";
 		String namePrecisionAndOffsetGreaterThanByteArray = " Precision and offset greater than byte array";
 		String nameErrorChecking = " Error checking";
 		String nameNull = " Null";
 		String nameInvalidDecimalTypes = " Invalid decimal type";
+		String nameInvalidData = " Invalid data";
 		String nameOverflow = " Overflow";
 		
 		value = Utils.TestValue.SmallPositive.BigIntegerValue;
@@ -2192,6 +2217,7 @@ public class TestDecimalData2 {
 		byte[] externalDecimal = new byte[64];
 		final int offset0 = 0;
 		final int offset5 = 5;
+		final int offset10 = 10;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision1 = 1;
@@ -2201,7 +2227,11 @@ public class TestDecimalData2 {
 		final int precision30 = 30;
 		final int precision31 = 31;
 		final int precision50 = 50;
+		final int precision100 = 100;
 		final boolean errorChecking = false;
+		final boolean errorCheckingFalse = false;
+		
+		final int scale0 = 0;
 		
 		final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
 		final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
@@ -2217,7 +2247,6 @@ public class TestDecimalData2 {
 		String testType = "Normal Value";
 		String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
 		
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "convertBigInteger";
 		
 		DecimalData.convertBigIntegerToExternalDecimal(value, externalDecimal, offset0, precision31, errorChecking, decimalType1);
@@ -4460,6 +4489,7 @@ public class TestDecimalData2 {
 	public void testConvertBigDecimalExceptions()
 	{
 		//lp.addCallerName(Utils.getCallingMethod());
+		byte[] byte_array = new byte[64];
 		final int offset0 = 0;
 		final int precision31 = 31;
 		final boolean errorChecking = true;
@@ -4468,22 +4498,36 @@ public class TestDecimalData2 {
 		BigDecimal value = Utils.TestValue.SmallPositive.BigDecimalValue;
 		
 		final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
+		final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
+		final int decimalType3 = DecimalData.EBCDIC_SIGN_SEPARATE_TRAILING;
+		final int decimalType4 = DecimalData.EBCDIC_SIGN_SEPARATE_LEADING;
+		final int decimalType5 = DecimalData.UNICODE_UNSIGNED;
 		final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
+		final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
 		
 		byte[] packedDecimal = new byte[64];
+		byte[] shiftedDecimal = new byte[64];
+		final int shift5 = 5 ;
+		final int shift25 = 25 ;
+		final int shift55 = 55 ;
+		final int shift85 = 85 ;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision100 = 100;
 		final int precision50 = 50;
 		final int precision5 = 5;
+		final boolean roundedFalse = false;
+		final boolean roundedTrue = true;
 		
 		final int scale0 = 0;
+		BigDecimal result;
 				
 		String namePrecisionGreaterThanByteArray = " Precision greater than byte array";
 		String namePrecisionAndOffsetGreaterThanByteArray = " Precision and offset greater than byte array";
 		String nameErrorChecking = " Error checking";
 		String nameNull = " Null";
 		String nameInvalidDecimalTypes = " Invalid decimal type";
+		String nameInvalidData = " Invalid data";
 		String nameOverflow = " Overflow";
 		
 		value = Utils.TestValue.SmallPositive.BigDecimalValue;
@@ -4959,6 +5003,7 @@ public class TestDecimalData2 {
 		byte[] externalDecimal = new byte[64];
 		final int offset0 = 0;
 		final int offset5 = 5;
+		final int offset10 = 10;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision1 = 1;
@@ -4968,7 +5013,9 @@ public class TestDecimalData2 {
 		final int precision30 = 30;
 		final int precision31 = 31;
 		final int precision50 = 50;
+		final int precision100 = 100;
 		final boolean errorChecking = false;
+		final boolean errorCheckingFalse = false;
 		
 		final int scale0 = 0;
 		
@@ -4986,7 +5033,6 @@ public class TestDecimalData2 {
 		String testType = "Normal Value";
 		String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
 		
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "convertBigDecimalToExternalDecimal/convertExternalDecimalToBigDecimal";
 				
 		DecimalData.convertBigDecimalToExternalDecimal(value, externalDecimal, offset0, precision31, errorChecking, decimalType1);
@@ -7235,6 +7281,7 @@ public class TestDecimalData2 {
 		byte[] externalDecimal = new byte[64];
 		final int offset0 = 0;
 		final int offset5 = 5;
+		final int offset10 = 10;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision1 = 1;
@@ -7244,7 +7291,9 @@ public class TestDecimalData2 {
 		final int precision30 = 30;
 		final int precision31 = 31;
 		final int precision50 = 50;
+		final int precision100 = 100;
 		final boolean errorChecking = false;
+		final boolean errorCheckingFalse = false;
 		
 		final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
 		final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
@@ -7260,7 +7309,6 @@ public class TestDecimalData2 {
 		String testType = "Normal Value";
 		String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
 		
-		@SuppressWarnings("unused") // Useful to know what we're testing
 		String functionName = "convertInteger";
 		
 		DecimalData.convertIntegerToExternalDecimal(value, externalDecimal, offset0, precision31, errorChecking, decimalType1);
@@ -9536,8 +9584,17 @@ public class TestDecimalData2 {
 		final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
 		final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
 		
+		final int shift5 = 5 ;
+		final int shift25 = 25 ;
+		final int shift55 = 55 ;
+		final int shift85 = 85 ;
 		final int offset25 = 25;
+		final int offset50 = 50;
+		final int precision100 = 100;
+		final int precision50 = 50;
 		final int precision5 = 5;
+		final boolean roundedFalse = false;
+		final boolean roundedTrue = true;
 		int result;
 				
 		String namePrecisionGreaterThanByteArray = " Precision greater than byte array";
@@ -9546,6 +9603,7 @@ public class TestDecimalData2 {
 		String nameErrorChecking = " Error checking";
 		String nameNull = " Null";
 		String nameInvalidDecimalTypes = " Invalid decimal type";
+		String nameInvalidData = " Invalid data";
 		String nameOverflow = " Overflow";
 
 		value = Utils.TestValue.SmallPositive.IntValue;
@@ -9557,6 +9615,8 @@ public class TestDecimalData2 {
 		byte[] longPackedDecimal = new byte[arrSize];
 		byte[] externalDecimal = new byte[arrSize];
 		byte[] packedDecimal = new byte[arrSize];
+		byte[] shiftedDecimal = new byte[arrSize];
+		byte[] byte_array = new byte[arrSize];
 		
 		try
 		{
@@ -10139,6 +10199,7 @@ public class TestDecimalData2 {
 		 * test invalid data
 		 */
 
+		byte[] byte_array = new byte[64];
 		final int offset0 = 0;
 		final int precision31 = 31;
 		final boolean errorChecking = true;
@@ -10154,8 +10215,17 @@ public class TestDecimalData2 {
 		final int decimalType6 = DecimalData.UNICODE_SIGN_SEPARATE_LEADING;
 		final int decimalType7 = DecimalData.UNICODE_SIGN_SEPARATE_TRAILING;
 		
+		final int shift5 = 5 ;
+		final int shift25 = 25 ;
+		final int shift55 = 55 ;
+		final int shift85 = 85 ;
 		final int offset25 = 25;
+		final int offset50 = 50;
+		final int precision100 = 100;
+		final int precision50 = 50;
 		final int precision5 = 5;
+		final boolean roundedFalse = false;
+		final boolean roundedTrue = true;
 		long result;
 				
 		String namePrecisionGreaterThanByteArray = " Precision greater than byte array";
@@ -10164,6 +10234,7 @@ public class TestDecimalData2 {
 		String nameErrorChecking = " Error checking";
 		String nameNull = " Null";
 		String nameInvalidDecimalTypes = " Invalid decimal type";
+		String nameInvalidData = " Invalid data";
 		String nameOverflow = " Overflow";
 		
 		value = Utils.TestValue.SmallPositive.LongValue;
@@ -10175,6 +10246,7 @@ public class TestDecimalData2 {
 		byte[] longPackedDecimal = new byte[arrSize];
 		byte[] externalDecimal = new byte[arrSize];
 		byte[] packedDecimal = new byte[arrSize];
+		byte[] shiftedDecimal = new byte[arrSize];
 		
 		try
 		{
@@ -10791,6 +10863,7 @@ public class TestDecimalData2 {
 		
 		final int offset0 = 0;
 		final int offset5 = 5;
+		final int offset10 = 10;
 		final int offset25 = 25;
 		final int offset50 = 50;
 		final int precision1 = 1;
@@ -10800,7 +10873,9 @@ public class TestDecimalData2 {
 		final int precision30 = 30;
 		final int precision31 = 31;
 		final int precision50 = 50;
+		final int precision100 = 100;
 		final boolean errorChecking = false;
+		final boolean errorCheckingFalse = false;
 		
 		final int decimalType1 = DecimalData.EBCDIC_SIGN_EMBEDDED_TRAILING;
 		final int decimalType2 = DecimalData.EBCDIC_SIGN_EMBEDDED_LEADING;
@@ -10815,6 +10890,7 @@ public class TestDecimalData2 {
 		String typeName = "EBCDIC_SIGN_EMBEDDED_TRAILING";
 		String testType = "Normal Value";
 		String testName = dataName + " " + Utils.TestValue.SmallPositive.TestName + " " + testType +  " " + typeName;
+		String functionName = "convertLong";
 		
 		DecimalData.convertLongToExternalDecimal(value, externalDecimal, offset0, precision31, errorChecking, decimalType1);
 		//lp.addExpected("convertLongToExternalDecimal");
