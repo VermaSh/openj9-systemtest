@@ -112,9 +112,7 @@ public class TestBD2PD2BD
      * 
      * test pass condition 1 : following conversion of int and BigDecimal in 2
      * PackedDecimal bytearrays, bytearrays holding the values must be equals to
-     * succeed 
-     * 
-     * test pass condition 2 : following conversion of byteArrays to
+     * succeed test pass condition 2 : following conversion of byteArrays to
      * long and BigDecimal , int values of both must be equals to succeed
      * 
      * test limits : int and BigDecimal to packed data conversion are tested one
@@ -184,9 +182,7 @@ public class TestBD2PD2BD
      * 
      * test pass condition 1 : following conversion of long and BigDecimal in 2
      * PackedDecimal bytearrays, bytearrays holding the values must be equals to
-     * succeed 
-     * 
-     * test pass condition 2 : following conversion of byteArrays to
+     * succeed test pass condition 2 : following conversion of byteArrays to
      * long and BigDecimal , long values of both must be equals to succeed
      * 
      * test limits : long and BigDecimal to packed data conversion are tested

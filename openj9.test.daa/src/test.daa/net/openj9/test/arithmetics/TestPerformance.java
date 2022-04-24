@@ -66,7 +66,7 @@ public class TestPerformance
     static Random randomGenerator = new Random(System.currentTimeMillis());
 
     @Test
-    public void testIntrinsicPerformance() throws Exception
+    public void testIntrinsicPerformance()
     {
         int sampleSize = 1000;
         int multiplier = 100;
@@ -92,8 +92,9 @@ public class TestPerformance
         }
         catch (Exception e)
         {
+            // TODO Auto-generated catch block
             e.printStackTrace();
-            throw e;
+            System.exit(-1);
         }
     }
 
