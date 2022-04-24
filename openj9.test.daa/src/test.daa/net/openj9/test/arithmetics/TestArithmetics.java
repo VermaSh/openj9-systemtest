@@ -112,6 +112,47 @@ public class TestArithmetics
         }
     }
 
+    private void testWithOffsetAndPrec(int resoffset, int resprec, int op1offset, int op1prec, int op2offset, int op2prec)
+    {
+        BigInteger value1 = getRandomBigInteger(op1prec);
+        BigInteger value2 = getRandomBigInteger(op2prec);
+        
+        byte[] input1 = getRandomInput(op1offset, op1prec, value1);
+        byte[] input2 = getRandomInput(op2offset, op2prec, value2);
+
+        byte[] reference = new byte[resoffset + resprec / 2 + 1];
+        byte[] resultant = new byte[resoffset + resprec / 2 + 1];
+        byte[] resultant2 = new byte[resoffset + resprec / 2 + 1];
+
+        BigInteger resultBI = value1.add(value2);
+        
+        DecimalData.convertBigIntegerToPackedDecimal(resultBI, reference, resoffset, resprec, true);
+        
+        PackedDecimal.addPackedDecimal(resultant, resoffset, resprec, input1, op1offset, op1prec, input2, op2offset, op2prec, false);
+        
+        try 
+        {
+            assertArrayEquals(reference, resultant);
+        }
+        
+        catch (AssertionError e)
+        {
+            assertArrayEquals(String.format("Reference: %s, Result: %s \n", Utils.byteArrayToString(reference), Utils.byteArrayToString(resultant2)), reference, resultant);
+        }
+        
+        PackedDecimal.addPackedDecimal(resultant2, resoffset, resprec, input1, op1offset, op1prec, input2, op2offset, op2prec, true);
+        
+        try 
+        {
+            assertArrayEquals(reference, resultant);
+        }
+        
+        catch (AssertionError e)
+        {
+            assertArrayEquals(String.format("Reference: %s, Result: %s \n", Utils.byteArrayToString(reference), Utils.byteArrayToString(resultant2)), reference, resultant);
+        }
+    }
+
     private byte[] getRandomInput(int offset, int prec, BigInteger bi)
     {
         int size = prec / 2 + 1;
