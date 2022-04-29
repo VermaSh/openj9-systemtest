@@ -206,7 +206,7 @@ public class TestI2PD
             }
         }
 
-        // TODO: add more test cases
+        // TODO: think of more test cases.
     }
 
     @Test

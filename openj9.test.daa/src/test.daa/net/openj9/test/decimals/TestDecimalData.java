@@ -614,7 +614,7 @@ public class TestDecimalData
         testi2PDHelper_p10(2147483647);
         testi2PDHelper_p10(-2147483648);
 
-        // TODO: test more precisions
+        // TODO: have to test more precisions
         randomGenerator.setSeed(1024);
         for (int i = 0; i < 10; ++i)
         {
@@ -627,7 +627,7 @@ public class TestDecimalData
     public void testi2PDExceptions()
     {
         testi2PDExceptionsHelper(123456);
-        // TODO: add more tests
+        // TODO: add more.
     }
 
     public void testi2PDExceptionsHelper(final int value)
@@ -649,7 +649,7 @@ public class TestDecimalData
 
     }
 
-    // TODO: test more precisions
+    // TODO: use more precisions
     public void testi2PDHelper_p10(final int value)
     {
         int result;

@@ -33,16 +33,19 @@ import org.junit.runner.manipulation.Filter;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
 
+//import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 public class TestRunner {
+    static String cvsid = "$Id: TestGeneration.java,v 1.2 2012-12-06 16:12:49 vetterlein Exp $";
 	public static void printUsage()
 	{
-		System.out.println ("Usage: java net.openj9.test.TestRunner testClassName [options] [methods...]");
+		System.out.println ("Usage: java com.ibm.test.TestRunner testClassName [options] [methods...]");
 		System.out.println ();
 
 		System.out.println ("Note: specify the options first, then methods, if any");
 		System.out.println ("where options include:");
 		System.out.println ("   testClassName");
-		System.out.println ("      Name of the test class, e.g. net.openj9.test.arithmetics.TestArithmeticOperations");
+		System.out.println ("      Name of the test class, ie. com.ibm.test.TestArithmeticOperations");
 		System.out.println ("   stackArg");
 		System.out.println ("      If stackArg is '-stackTrace', the stack trace will be printed for failure, else, no stack trace will be printed");
 		System.out.println ("   runAllArg");
@@ -124,7 +127,7 @@ public class TestRunner {
 			}
 		}
 		
-		Class<?> testClass = Class.forName(testClassName);
+		Class testClass = Class.forName(testClassName);
 		
 		Request myRequest = Request.aClass(testClass);
 		
@@ -166,10 +169,10 @@ public class TestRunner {
 		}
 		
 		System.out.println ();
-		System.out.println ("Total run time: " + totalRunTime + " ms");
+		//System.out.println ("Total run time: " + totalRunTime + " ms");
 		System.out.println ("Total run count: " + totalRunCount);
 		System.out.println ("Total fail count: " + totalFailCount);
-		System.out.println ("Last run time: " + result.getRunTime() + " ms");
+		//System.out.println ("Last run time: " + result.getRunTime() + " ms");
 		System.out.println ("Last run count: " + result.getRunCount());
 		System.out.println ("Last fail count: " + result.getFailureCount());
 		System.out.println ();
@@ -177,12 +180,17 @@ public class TestRunner {
 		List<Failure> listOfFailures = result.getFailures();
 		
 		Failure currFailure;
+		Description failureDescription;
+		Throwable failureException;
+		
 		
 		System.out.println ("Failed tests: ");
 		
 		for (int i=0;i<listOfFailures.size();i++)
 		{
 			currFailure = listOfFailures.get(i);
+			failureDescription = currFailure.getDescription();
+			failureException = currFailure.getException();
 			System.out.println ("" + (i+1) + ") " + currFailure.getTestHeader());
 			if (printStack)
 				System.out.println (toDiagnosticMode(currFailure.getTrace(), diagMode));

@@ -49,7 +49,6 @@ public class TestGeneration {
 	@Test
 	public void LogCompare()
 	{
-		@SuppressWarnings("unused") // Unused if fail(output) below is uncommented
 		String output = "";
 		String inlined = "";
 		
@@ -89,7 +88,7 @@ public class TestGeneration {
     }
 	
 	@Parameters
-	public static Collection<?> data() throws IOException
+	public static Collection data() throws IOException
 	{
 		List<String> inputArgs = ManagementFactory.getRuntimeMXBean().getInputArguments();
 		
@@ -129,6 +128,8 @@ public class TestGeneration {
 		LogParser.parseLogFile(vlogFile, parseFile);
 		
 		String tempFuncName = null;
+		String[] tempParse;
+		String[] tempExpec;
 		
 		ArrayList<String> tempExpecList = new ArrayList<String>();
 		ArrayList<String> tempParseList = new ArrayList<String>();
@@ -161,8 +162,6 @@ public class TestGeneration {
 				tempExpecList.add(temp);
 			temp = br.readLine();
 		}
-		
-		br.close();
 		
 		if (!tempExpecList.isEmpty() && tempFuncName != null)
 		{

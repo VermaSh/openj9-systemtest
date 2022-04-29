@@ -2519,32 +2519,24 @@ public class TestShiftsAndConvert
     @Test
     public void testLeftOffsetOne()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
-        byte[] expectedArray2 = new byte[10];
+	byte[] expectedArray2 = new byte[10];
 
         // Fill with garbage characters
         Arrays.fill(inputArray, (byte) 0xff);
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
-        Arrays.fill(expectedArray2, (byte) 0xff);
+	Arrays.fill(expectedArray2, (byte) 0xff);
 
         // Test precision of 1 digit, shifted left by 1
         inputArray[1] = 0x5D;
         expectedArray[2] = 0x0D;
-        expectedArray2[2] = 0x0C;
+	expectedArray2[2] = 0x0C;
         PackedDecimal.shiftLeftPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 1, false);
-        boolean isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
-        assertTrue("testLeftOffsetOne - Test precision of 1 << 1 to precision 1", isExpectedResult);
+	boolean isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
+	assertTrue("testLeftOffsetOne - Test precision of 1 << 1 to precision 1", isExpectedResult);
     }
 
     @Test
@@ -2761,7 +2753,8 @@ public class TestShiftsAndConvert
 
         value = Utils.TestValue.LargeNegative.LongValue;
 
-        // TODO: add a test to test for 0xC/0xD when negative numbers are shifted to zero
+        // TODO: add test to test for 0xC/0xD when negative numbers are shifted
+        // to zero
         // ie, -9 shift right 5
 
         Arrays.fill(packedDecimal, (byte) 0x00);
@@ -2849,12 +2842,13 @@ public class TestShiftsAndConvert
         Arrays.fill(shiftedDecimal, (byte) 0x00);
         DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
         PackedDecimal.shiftLeftPackedDecimal(shiftedDecimal, offset0, precision31, packedDecimal, offset0, precision31, shift5, errorChecking);
-        // result = DecimalData.convertPackedDecimalToLong(shiftedDecimal, offset0, precision31, errorChecking);
-        
+        // result = DecimalData.convertPackedDecimalToLong(shiftedDecimal,
+        // offset0, precision31, errorChecking);
         /*
-         * The following result is too big for long, don't test
+         * TODO: result is too big for long dont test
          */
-        // Utils.makeTestNameShift("", functionName, value, packedDecimal, offset0, precision31, shiftedDecimal, offset0,
+        // Utils.makeTestNameShift("", functionName, value,
+        // packedDecimal, offset0, precision31, shiftedDecimal, offset0,
         // precision31, shift5, roundedFalse, errorChecking);
         // assertEquals(testName, shiftLeft(value, shift5), result);
 
@@ -3209,6 +3203,9 @@ public class TestShiftsAndConvert
         shiftedDecimal = new byte[9];
         byte[] brokenPackedDecimal = new byte[] { 0x12, 0x23, (byte) 0xff, (byte) 0xcb, (byte) 0xb2, (byte) 0xa2, (byte) 0xd9, (byte) 0xaa, (byte) 0xbc };
 
+        // same as brokenPackedDecimal, except every element is shifted to left
+        // by one. last element is 0x0C (sign)
+        byte[] brokenPackedDecimalShifted = new byte[] { 0x23, (byte) 0xff, (byte) 0xcb, (byte) 0xb2, (byte) 0xa2, (byte) 0xd9, (byte) 0xaa, (byte) 0xb0, 0x0C };
         final int precision7 = 7;
         final int shift2 = 2;
         try
@@ -3233,6 +3230,19 @@ public class TestShiftsAndConvert
         }        
 
        
+        /* DAA API no longer accepts and shifts broken packed decimal. This assertArrayEquals() is meaningless.
+        
+        String functionName = "shifts";
+
+        try
+        {
+            assertArrayEquals(brokenPackedDecimalShifted, shiftedDecimal);
+        }
+
+        catch (AssertionError e)
+        {
+            assertArrayEquals(Utils.makeTestNameShift("", functionName, value, brokenPackedDecimal, offset0, 17, shiftedDecimal, offset0, 17, shift2, roundedFalse, errorCheckingFalse), brokenPackedDecimalShifted, shiftedDecimal);
+        }*/
 
         Arrays.fill(packedDecimal, (byte) 0x00);
         Arrays.fill(shiftedDecimal, (byte) 0x00);
@@ -3291,9 +3301,12 @@ public class TestShiftsAndConvert
         {
             DecimalData.convertLongToPackedDecimal(value, packedDecimal, offset0, precision31, errorChecking);
             PackedDecimal.shiftLeftPackedDecimal(shiftedDecimal, offset0, precision31, packedDecimal, offset0, precision31, shift5n, errorChecking);
-           
-            fail("Assertion in TestShiftsAndConvert on line " +
-              Thread.currentThread().getStackTrace()[2].getLineNumber());
+            /*
+             * TODO: in the comments it says shiftAmount has to be >=0, but
+             * doesnt check for it or throw exceptions
+             */
+            // fail("Assertion in TestShiftsAndConvert on line " +
+            // Thread.currentThread().getStackTrace()[2].getLineNumber());
         }
         catch (IllegalArgumentException e)
         {
@@ -3323,7 +3336,8 @@ public class TestShiftsAndConvert
         if (prec2 < prec1)
             newvalue = newvalue % ((int) (Math.pow(10, prec2)));
         String str = String.format("value: %d, sA: %d, prec2: %d, result: %d, newvalue: %d \n", value, shiftAmount, prec2, result, newvalue);
-        // System.out.printf("value: %d, sA: %d, prec2:%d, result:%d, newvalue:%d \n", value, shiftAmount, prec2, result, newvalue);
+        // System.out.printf("value: %d, sA: %d, prec2:%d, result:%d, newvalue:%d \n",
+        // value, shiftAmount, prec2, result, newvalue);
         assertEquals(str, newvalue, result);
     }
 
@@ -3338,13 +3352,14 @@ public class TestShiftsAndConvert
             int prec2 = length - shiftAmount;
             if (randomGen.nextBoolean())
                 value = -value;
-            // System.out.printf("Simple value: %d, sA: %d, prec2:%d \n", value, shiftAmount, prec2);
+            // System.out.printf("Simple value: %d, sA: %d, prec2:%d \n", value,
+            // shiftAmount, prec2);
             testShiftRight(value, length, shiftAmount, prec2, false);
         }
     }
 
     @Test
-    public void testShiftRightLowerDstPrec() // decrease precision from front
+    public void testShiftRightLowerDstPrec() // decrease prec from front
     {
         for (int i = 0; i < 1000; i++)
         {
@@ -3356,7 +3371,8 @@ public class TestShiftsAndConvert
                 value = -value;
             if (prec2 <= 0)
                 prec2 = 1;
-            // System.out.printf("LDP value: %d, sA: %d, prec2:%d \n", value, shiftAmount, prec2);
+            // System.out.printf("LDP value: %d, sA: %d, prec2:%d \n", value,
+            // shiftAmount, prec2);
             testShiftRight(value, length, shiftAmount, prec2, false);
         }
     }
@@ -3372,7 +3388,8 @@ public class TestShiftsAndConvert
             int prec2 = length - shiftAmount + randomGen.nextInt(3);
             if (randomGen.nextBoolean())
                 value = -value;
-            // System.out.printf("HDP value: %d, sA: %d, prec2:%d \n", value, shiftAmount, prec2);
+            // System.out.printf("HDP value: %d, sA: %d, prec2:%d \n", value,
+            // shiftAmount, prec2);
             Arrays.fill(copy, (byte) 0xFF);
             testShiftRight(value, length, shiftAmount, prec2, false);
         }
@@ -3390,7 +3407,8 @@ public class TestShiftsAndConvert
             int prec2 = length - shiftAmount + 1;
             if (randomGen.nextBoolean())
                 value = -value;
-            // System.out.printf("Rounding value: %d, sA: %d, prec2:%d \n", value, shiftAmount, prec2);
+            // System.out.printf("Rounding value: %d, sA: %d, prec2:%d \n",
+            // value, shiftAmount, prec2);
             testShiftRight(value, length, shiftAmount, prec2, true);
         }
 
@@ -3457,24 +3475,16 @@ public class TestShiftsAndConvert
     @Test
     public void testShiftLeftUnitCases()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
-        byte[] expectedArray2 = new byte[10];
+	byte[] expectedArray2 = new byte[10];
 
         // Fill with garbage characters
         Arrays.fill(inputArray, (byte) 0xff);
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
-        Arrays.fill(expectedArray2, (byte) 0xff);
+	Arrays.fill(expectedArray2, (byte) 0xff);
 
         // Test precision of 1 digit, no shift
         inputArray[1] = 0x5D;
@@ -3484,15 +3494,15 @@ public class TestShiftsAndConvert
 
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
-        Arrays.fill(expectedArray2, (byte) 0xff);
+	Arrays.fill(expectedArray2, (byte) 0xff);
 
         // Test precision of 1 digit, shifted by 1
         inputArray[1] = 0x5D;
         expectedArray[2] = 0x0D;
-        expectedArray2[2] = 0x0C;
+	expectedArray2[2] = 0x0C;
         PackedDecimal.shiftLeftPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 1, false);
-        boolean isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
-        assertTrue("testShiftLeftUnitCases - Test precision of 1 << 1 to precision 1", isExpectedResult);
+	boolean isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
+	assertTrue("testShiftLeftUnitCases - Test precision of 1 << 1 to precision 1", isExpectedResult);
 
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
@@ -3552,7 +3562,7 @@ public class TestShiftsAndConvert
 
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
-        Arrays.fill(expectedArray2, (byte) 0xff);
+	Arrays.fill(expectedArray2, (byte) 0xff);
 
         // Test precision of 2 digit (08 5D), shifted by 2 to precision 2 (00
         // 0D).
@@ -3560,24 +3570,16 @@ public class TestShiftsAndConvert
         inputArray[2] = 0x5D;
         expectedArray[2] = 0x00;
         expectedArray[3] = 0x0D;
-        expectedArray2[2] = 0x00;
+	expectedArray2[2] = 0x00;
         expectedArray2[3] = 0x0C;
         PackedDecimal.shiftLeftPackedDecimal(outputArray, 2, 2, inputArray, 1, 2, 2, false);
-        isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
-        assertTrue("testShiftLeftUnitCases - Test precision of 2 << 2 to precision 2", isExpectedResult);
+	isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
+	assertTrue("testShiftLeftUnitCases - Test precision of 2 << 2 to precision 2", isExpectedResult);
     }
 
     @Test
     public void testShiftRightUnitCases()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -3597,7 +3599,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 1 digit, shifted left by 0, no rounding - checkOverflow
+        // Test precision of 1 digit, shifted left by 0, no rounding -
+        // checkOverflow
         inputArray[1] = 0x5D;
         expectedArray[2] = 0x5D;
         PackedDecimal.shiftRightPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 0, false, true);
@@ -3619,10 +3622,12 @@ public class TestShiftsAndConvert
         Arrays.fill(expectedArray, (byte) 0xff);
         Arrays.fill(expectedArray2, (byte) 0xff);
 
-        // Test precision of 1 digit, shifted right by 1, no rounding - checkOverflow
+        // Test precision of 1 digit, shifted right by 1, no rounding -
+        // checkOverflow
         inputArray[1] = 0x5D;
         expectedArray[2] = 0x0D;
         expectedArray2[2] = 0x0C;
+        
         PackedDecimal.shiftRightPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 1, false, true);
         isExpectedResult = Arrays.equals(expectedArray, outputArray) || Arrays.equals(expectedArray2, outputArray);
         assertTrue("testShiftRightUnitCases - Test precision of 1 >> 1 to precision 1 no rounding check overflow", isExpectedResult);
@@ -3660,7 +3665,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 1 digit, shifted right by 1, rounding to 1 - checkOverflow
+        // Test precision of 1 digit, shifted right by 1, rounding to 1
+        // checkOverflow
         inputArray[1] = (byte) 0x9C;
         expectedArray[2] = 0x1C;
         PackedDecimal.shiftRightPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 1, true, true);
@@ -3680,7 +3686,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 1 digit, shifted by 2 to precision 2, no rounding - checkOverflow
+        // Test precision of 1 digit, shifted by 2 to precision 2, no rounding
+        // checkOverflow
         inputArray[1] = 0x5C;
         expectedArray[2] = 0x00;
         expectedArray[3] = 0x0C;
@@ -3702,7 +3709,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 1 digit, shifted by 2 to precision 2, rounding - checkOverflow
+        // Test precision of 1 digit, shifted by 2 to precision 2, rounding
+        // checkOverflow
         inputArray[1] = 0x7C;
         expectedArray[2] = 0x00;
         expectedArray[3] = 0x0C;
@@ -3730,7 +3738,8 @@ public class TestShiftsAndConvert
         Arrays.fill(expectedArray, (byte) 0xff);
         Arrays.fill(expectedArray2, (byte) 0xff);
 
-        // Test precision of 2 digit, shifted by 2, to precision 3 - checkOverflow
+        // Test precision of 2 digit, shifted by 2, to precision 3 -
+        // checkOverflow
         inputArray[1] = 0x08;
         inputArray[2] = 0x5D;
         expectedArray[2] = 0x00;
@@ -3745,7 +3754,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 2 digit, shifted by 1, to precision 1 with no rounding
+        // Test precision of 2 digit, shifted by 1, to precision 1 with no
+        // rounding
         inputArray[1] = 0x09;
         inputArray[2] = 0x5D;
         expectedArray[2] = (byte) 0x9D;
@@ -3756,7 +3766,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 2 digit, shifted by 1, to precision 1 with no rounding - checkOverflow
+        // Test precision of 2 digit, shifted by 1, to precision 1 with no
+        // rounding - checkOverflow
         inputArray[1] = 0x09;
         inputArray[2] = 0x5D;
         expectedArray[2] = (byte) 0x9D;
@@ -3779,7 +3790,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 2 digit, shifted by 2, to precision 3 - checkOverflow
+        // Test precision of 2 digit, shifted by 2, to precision 3 -
+        // checkOverflow
         inputArray[1] = 0x08;
         inputArray[2] = 0x5D;
         expectedArray[2] = 0x00;
@@ -3803,7 +3815,8 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 3 digit, shifted by 2, to precision 3 - checkOverflow
+        // Test precision of 3 digit, shifted by 2, to precision 3 -
+        // checkOverflow
         inputArray[1] = 0x18;
         inputArray[2] = 0x5C;
         expectedArray[2] = 0x00;
@@ -3913,7 +3926,7 @@ public class TestShiftsAndConvert
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
 
-        // Test precision of 3 digit (023C), shifted by 1 (002C), to precision 1 
+        // Test precision of 3 digit (023C), shifted by 1 (002C), to precision 1
         // 2C)
         inputArray[1] = 0x02;
         inputArray[2] = 0x5C;
@@ -4505,14 +4518,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts1()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4540,46 +4545,30 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts2()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
-        byte[] expectedArray2 = new byte[10];
-        
+	byte[] expectedArray2 = new byte[10];
+
         // Fill with garbage characters
         Arrays.fill(inputArray, (byte) 0xff);
         Arrays.fill(outputArray, (byte) 0xff);
         Arrays.fill(expectedArray, (byte) 0xff);
-        Arrays.fill(expectedArray2, (byte) 0xff);
-        
+	Arrays.fill(expectedArray2, (byte) 0xff);
+
         // Test precision of 1 digit, shifted by 1
         inputArray[1] = 0x5D;
         expectedArray[2] = 0x0D;
-        expectedArray2[2] = 0x0C;
+	expectedArray2[2] = 0x0C;
         PackedDecimal.shiftLeftPackedDecimal(outputArray, 2, 1, inputArray, 1, 1, 1, false);
-        
-        boolean compResult = Arrays.equals(outputArray, expectedArray) ||  Arrays.equals(outputArray, expectedArray2);
+
+	boolean compResult = Arrays.equals(outputArray, expectedArray) ||  Arrays.equals(outputArray, expectedArray2);
         assertTrue("testZeroShifts2 - Test precision of 1 << 1 to precision 1", compResult);
     }
 
     @Test
     public void testZeroShifts3()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
@@ -4609,14 +4598,6 @@ public class TestShiftsAndConvert
     @Test
     public void testZeroShifts4()
     {
-        /* Both expectedArray and expectedArray2 are needed because
-         * there was a behavioral change for VSRP instruction on z15
-         * and up. On z15 and up, if the result following the shift
-         * is 0, it is treated as positive. However, on prior
-         * hardware the 0 would retain the sign of the input packed
-         * decimal. For example: doing a left shift by 1 on 5D (-5)
-         * would result in 0D (-0) on z14; and 0C (+0) on z15 and above.
-         */
         byte[] inputArray = new byte[10];
         byte[] outputArray = new byte[10];
         byte[] expectedArray = new byte[10];
