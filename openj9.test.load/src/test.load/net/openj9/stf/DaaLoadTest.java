@@ -146,7 +146,7 @@ public class DaaLoadTest extends TimeBasedLoadTest {
 			
 		loadTestInvocation = loadTestInvocation.generateCoreDumpAtFirstLoadTestFailure(false)
 				.addSuite("daa")
-				.setSuiteThreadCount(cpuCount - 2, 2);
+				.setSuiteThreadCount(1); // (cpuCount - 2, 2);
 		
 		if (!isTimeBasedLoadTest) { 
 			loadTestInvocation = loadTestInvocation.setSuiteNumTests(numDaaTests * multiplier);
