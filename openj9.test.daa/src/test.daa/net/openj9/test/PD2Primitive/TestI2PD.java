@@ -116,8 +116,12 @@ public class TestI2PD
         if (precision == 0)
             precision = 1;
 
+        if (precision <= 0)
+
         if (isRandom && randomGen.nextBoolean())
             value = -value;
+
+        randomGen.nextInt(precision - 1);
 
         // create reference array value
         BigInteger refVal = new BigInteger((new Integer(value).toString()));
@@ -353,5 +357,12 @@ public class TestI2PD
 
         if (!catched)
             fail();
+    }
+
+    @Test
+    public void testVariablePrecision()
+    {
+        byte[] packedDecimal = new byte[offset+20];
+        DecimalData.convertIntegerToPackedDecimal(
     }
 }
